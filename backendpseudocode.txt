@@ -1,0 +1,48 @@
+objects:
+board
+token
+
+object attributes:
+board.color
+board.height
+board.width
+board.reset
+board.token_positions
+board.update_tokens
+
+board.drop {
+    def drop(column):
+        tokenRow = 0
+        for i in range(len(listOfLists) - 1, -1, -1):
+            if listOfLists[i][column] == 0:
+                tokenRow = i
+                break
+}
+
+
+board.player_win_horiz(self, token.player)
+board.player_win_vert(self, token.player)
+board.player_win_diag(self, token.player)
+board.player_win(self, token.player)
+
+
+token.color
+token.position
+token.player
+
+
+global variable player_roster
+
+
+PSEUDOCODE OF ONE ROUND
+player 1 chooses player 1
+player 2 chooses player 2
+destroy screen, go to screen of actual game with board
+
+
+choose column
+board.drop
+
+
+
+
