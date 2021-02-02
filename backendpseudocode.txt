@@ -8,13 +8,13 @@ board.height
 board.width
 board.reset
 board.token_positions
-board.update_tokens
+
 
 board.drop {
     def drop(column):
         tokenRow = 0
-        for i in range(len(listOfLists) - 1, -1, -1):
-            if listOfLists[i][column] == 0:
+        for i in range(len(board.token_positions) - 1, -1, -1):
+            if board.token_positions[i][column] == 0:
                 tokenRow = i
                 break
 }
@@ -39,9 +39,20 @@ player 1 chooses player 1
 player 2 chooses player 2
 destroy screen, go to screen of actual game with board
 
+won = False
+while not won:
+    for player in player_roster:
+        player chooses column to drop token in
+        board.drop to update board.token_positions
+        check if player won:
+            winner = player
+            won = True
+            break
 
-choose column
-board.drop
+show winner
+board.reset
+
+
 
 
 
