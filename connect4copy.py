@@ -1,5 +1,6 @@
 import arcade
 
+
 #import token
 #player1 = Token()
 #player2 = Token()
@@ -190,6 +191,10 @@ class Connect4(arcade.View):
                             turnTxt = "Player 1's turn"
                         turn += 1
                         break
+        if key == arcade.key.ESCAPE:
+            menu_view = MenuView()
+            self.window.show_view(menu_view)
+            menu_view.setup()
                     
 
     def on_draw(self):
@@ -218,15 +223,14 @@ class Connect4(arcade.View):
                 arcade.draw_text(str(column),x+80,550,arcade.color.BLACK, font_size=20, anchor_x="center")
                 arcade.draw_circle_filled(x+80,y,30,tokencolor)
         
-        arcade.draw_rectangle_filled(WIDTH/2, 750, 700, 75, arcade.color.WHITE)
-        arcade.draw_text("On your keyboard, press on the number corresponding to\nthe column you want to place your token in.", WIDTH/2,725,
+        arcade.draw_rectangle_filled(WIDTH/2, 750, 700, 85, arcade.color.WHITE)
+        arcade.draw_text("On your keyboard, press on the number corresponding to\nthe column you want to place your token in.\nPress Esc to reset.", WIDTH/2,715,
                          arcade.color.BLACK, font_size=20, anchor_x="center")
         arcade.draw_text(turnTxt, WIDTH/2,625,
                          arcade.color.BLACK, font_size=20, anchor_x="center")
-    
-    
-
         
+
+    
 
 
 class GameOverView(arcade.View):
