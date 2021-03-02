@@ -1,5 +1,7 @@
 import arcade
-from connect4copy import *
+# from connect4 import Connect4
+from startscreen import *
+
 
 def main():
     """ Startup """
@@ -9,6 +11,4 @@ def main():
     menu_view.setup()
     arcade.run()
 
-
-if __name__ == "__main__":
-    main()
+main()

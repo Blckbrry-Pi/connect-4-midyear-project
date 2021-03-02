@@ -1,6 +1,7 @@
 import arcade
 import copy
 import connect4
+import connect4copy
 
 WIDTH = 800
 HEIGHT = 800
@@ -132,16 +133,58 @@ class MenuView2(arcade.View):
         global player1color
 
         if _x >= 162.5 and _x <= 237.5 and _y >= 262.5 and _y <= 337.5:
-            player2color = colors[0]  #player.color = arcade.color.RED
-            c4 = connect4.Connect4(player1color,player2color)
-            self.window.show_view(c4)
+            player2color = colors[0]  
+            mode = MenuView3()
+            self.window.show_view(mode)
         elif _x >= 292.5 and _x <= 367.5 and _y >= 262.5 and _y <= 337.5:
             player2color = colors[1]
-            c4 = connect4.Connect4(player1color,player2color)
-            self.window.show_view(c4)
+            mode = MenuView3()
+            self.window.show_view(mode)
         elif _x >= 422.5 and _x <= 497.5 and _y >= 262.5 and _y <= 337.5:
             player2color = colors[2]
-            c4 = connect4.Connect4(player1color,player2color)
-            self.window.show_view(c4)
+            mode = MenuView3()
+            self.window.show_view(mode)
         else:
             arcade.set_background_color(arcade.color.WHITE)
+
+class MenuView3(arcade.View):
+    """ Manage the 'game' view for our program. """
+    def __init__(self):
+        """ Initializer """
+
+        # Call the parent class initializer
+        super().__init__()
+
+    def on_show(self):
+        """ Called when switching to this view"""
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_draw(self):
+        """ Draw the menu """
+        arcade.start_render()
+
+        arcade.draw_rectangle_filled(WIDTH/4, HEIGHT/2, WIDTH/2, HEIGHT, arcade.color.YELLOW)
+        arcade.draw_rectangle_filled(WIDTH * (3/4), HEIGHT/2, WIDTH/2, HEIGHT, arcade.color.PIGGY_PINK)
+        arcade.draw_rectangle_filled(WIDTH/2, 700, 700, 125, arcade.color.WHITE)
+        arcade.draw_text("CHOOSE YOUR GAMEMODE\n(Bombed mode includes bombs in some\nplaces where no player can place tokens)", WIDTH/2,650,
+                         arcade.color.BLACK, font_size=30, anchor_x="center")
+        
+        arcade.draw_text("NORMAL", WIDTH/4,400,
+                         arcade.color.BLACK, font_size=40, anchor_x="center")
+        arcade.draw_text("BOMBED", WIDTH * (3/4),400,
+                         arcade.color.BLACK, font_size=40, anchor_x="center")
+        
+    
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """ Use a mouse press to advance to the 'game' view. """
+        global player2color
+        global player1color
+
+        if _x <= WIDTH/2:
+            c4 = connect4.Connect4(player1color,player2color)
+        else:
+            c4 = connect4copy.Connect4Bomb(player1color,player2color)
+            c4.setup()
+
+        self.window.show_view(c4)

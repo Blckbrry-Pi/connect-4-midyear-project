@@ -226,6 +226,7 @@ class Connect4(arcade.View):
             turnTxt = 'Player ' + str(self.win(self.grid)[0]) + ' won the game! Press Esc to play again.'
 
         if key == arcade.key.ESCAPE:
+            turnTxt = "Player 1's turn"
             menu_view = startscreen.MenuView()
             self.window.show_view(menu_view)
             menu_view.setup()
@@ -264,3 +265,6 @@ class Connect4(arcade.View):
 
         arcade.draw_text(turnTxt, WIDTH/2,625,
                          arcade.color.BLACK, font_size=30, anchor_x="center")
+
+        arcade.draw_text("NORMAL MODE", 100,675,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
