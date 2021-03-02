@@ -1,153 +1,12 @@
 import arcade
 import copy
+import random
+import startscreen
 
-#import token
-#player1 = Token()
-#player2 = Token()
 
 
 WIDTH = 800
 HEIGHT = 800
-
-
-
-class MenuView(arcade.View):
-    """ Class that manages the 'menu' view. """
-    def __init__(self):
-        """ Initializer """
-
-        # Call the parent class initializer
-        super().__init__()
-        self.background = None
-        self.token = None
-
-
-    def setup(self):
-        self.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
-        token = arcade.Sprite(":resources:images/items/gold_1.png",1.5)
-        token.center_x = WIDTH/2
-        token.center_y = 650
-        self.token = token
-
-    def on_show(self):
-        """ Called when switching to this view"""
-        arcade.set_background_color(arcade.color.WHITE)
-
-    def on_draw(self):
-        """ Draw the menu """
-        arcade.start_render()
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            WIDTH, HEIGHT,
-                                            self.background)
-        arcade.draw_rectangle_filled(WIDTH/2, 525, 700, 100, arcade.color.WHITE)
-        arcade.draw_text("Player 1 - choose your color", WIDTH/2,500,
-                         arcade.color.BLACK, font_size=40, anchor_x="center")
-
-        self.token.draw()
-        arcade.draw_rectangle_filled(WIDTH/2, 300, 600, 125, arcade.color.WHITE)
-
-        x = 200
-        y = 300
-        width = 75
-        height = 75
-        global colors
-        colors = [arcade.color.RED, arcade.color.BLACK, arcade.color.YELLOW, arcade.color.GREEN]
-        for color in colors:
-            arcade.draw_rectangle_filled(x, y, width, height, color)
-            x += width + 55
-
-        
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """ Use a mouse press to advance to the 'game' view. """
-        menuView2 = MenuView2()
-        menuView2.setup()
-        global player1color
-
-        if _x >= 162.5 and _x <= 237.5 and _y >= 262.5 and _y <= 337.5:
-            player1color = colors[0]  #player.color = arcade.color.RED
-            del colors[0]
-            self.window.show_view(menuView2)
-        elif _x >= 292.5 and _x <= 367.5 and _y >= 262.5 and _y <= 337.5:
-            player1color = colors[1]
-            del colors[1]
-            self.window.show_view(menuView2)
-        elif _x >= 422.5 and _x <= 497.5 and _y >= 262.5 and _y <= 337.5:
-            player1color = colors[2]
-            del colors[2]
-            self.window.show_view(menuView2)
-        elif _x >= 552.5 and _x <= 627.5 and _y >= 262.5 and _y <= 337.5:
-            player1color = colors[3]
-            del colors[3]
-            self.window.show_view(menuView2)
-        
-        
-
-
-
-class MenuView2(arcade.View):
-    """ Manage the 'game' view for our program. """
-    def __init__(self):
-        """ Initializer """
-
-        # Call the parent class initializer
-        super().__init__()
-        self.background = None
-        self.token = None
-
-
-    def setup(self):
-        self.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
-        token = arcade.Sprite(":resources:images/items/coinSilver_test.png",1.5)
-        token.center_x = WIDTH/2
-        token.center_y = 650
-        self.token = token
-
-    def on_show(self):
-        """ Called when switching to this view"""
-        arcade.set_background_color(arcade.color.WHITE)
-
-    def on_draw(self):
-        """ Draw the menu """
-        arcade.start_render()
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            WIDTH, HEIGHT,
-                                            self.background)
-        arcade.draw_rectangle_filled(WIDTH/2, 525, 700, 100, arcade.color.WHITE)
-        arcade.draw_text("Player 2 - choose your color", WIDTH/2,500,
-                         arcade.color.BLACK, font_size=40, anchor_x="center")
-        
-        self.token.draw()
-        arcade.draw_rectangle_filled(WIDTH/2, 300, 600, 125, arcade.color.WHITE)
-        
-        x = 200
-        y = 300
-        width = 75
-        height = 75
-
-        for color in colors:
-            arcade.draw_rectangle_filled(x, y, width, height, color)
-            x += width + 55
-    
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """ Use a mouse press to advance to the 'game' view. """
-        connect4 = Connect4()
-        global player2color
-        
-
-        if _x >= 162.5 and _x <= 237.5 and _y >= 262.5 and _y <= 337.5:
-            player2color = colors[0]  #player.color = arcade.color.RED
-            self.window.show_view(connect4)
-        elif _x >= 292.5 and _x <= 367.5 and _y >= 262.5 and _y <= 337.5:
-            player2color = colors[1]
-            self.window.show_view(connect4)
-        elif _x >= 422.5 and _x <= 497.5 and _y >= 262.5 and _y <= 337.5:
-            player2color = colors[2]
-            self.window.show_view(connect4)
-        else:
-            arcade.set_background_color(arcade.color.WHITE)
-        
 
 rowCount = 6
 columnCount = 7
@@ -159,8 +18,8 @@ screenHeight = (height + margins) * rowCount + margins
 turn = 1
 turnTxt = "Player 1's turn"
 
-class Connect4(arcade.View):
-    def __init__(self):
+class Connect4Bomb(arcade.View):
+    def __init__(self,p1color,p2color):
         super().__init__()
 
         self.grid = []
@@ -168,11 +27,20 @@ class Connect4(arcade.View):
             self.grid.append([])
             for column in range(columnCount):
                 self.grid[row].append(0)
+        self.player1color = p1color
+        self.player2color = p2color
+        self.bomb_list = arcade.SpriteList()
         
         arcade.set_background_color(arcade.color.LIGHT_BLUE)
 
     def setup(self):
-        pass
+        for bombs in range(3):
+            row = random.randint(0,5)
+            column = random.randint(0,6)
+            while self.grid[row][column] == 3:
+                row = random.randint(0,5)
+                column = random.randint(0,6)
+            self.grid[row][column] = 3
     
     def horizWin(self,grid):
         win=[0,False]
@@ -191,7 +59,7 @@ class Connect4(arcade.View):
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
             p1tokens=0
@@ -218,7 +86,7 @@ class Connect4(arcade.View):
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
             p1tokens=0
@@ -242,11 +110,11 @@ class Connect4(arcade.View):
                     if p1tokens>=4:
                         win=[1,True]
                 elif row[i]==2:
-                    p1token=0
+                    p1tokens=0
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
                 i += 1
@@ -265,11 +133,11 @@ class Connect4(arcade.View):
                     if p1tokens>=4:
                         win=[1,True]
                 elif row[i]==2:
-                    p1token=0
+                    p1tokens=0
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
                 i += 1
@@ -299,11 +167,11 @@ class Connect4(arcade.View):
                     if p1tokens>=4:
                         win=[1,True]
                 elif row[i]==2:
-                    p1token=0
+                    p1tokens=0
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
                 i += 1
@@ -323,11 +191,11 @@ class Connect4(arcade.View):
                     if p1tokens>=4:
                         win=[1,True]
                 elif row[i]==2:
-                    p1token=0
+                    p1tokens=0
                     p2tokens+=1
                     if p2tokens>=4:
                         win=[2,True]
-                elif row[i]==0:
+                else:
                     p1tokens=0
                     p2tokens=0
                 i += 1
@@ -356,20 +224,27 @@ class Connect4(arcade.View):
             for keys in ([arcade.key.KEY_0,0],[arcade.key.KEY_1,1],[arcade.key.KEY_2,2],[arcade.key.KEY_3,3],[arcade.key.KEY_4,4],[arcade.key.KEY_5,5],[arcade.key.KEY_6,6]):
                 if key == keys[0]:
                     for rowIndex in range(len(self.grid)):
-                        if self.grid[rowIndex][keys[1]] == 0:
+                        if self.grid[rowIndex][keys[1]] == 0 or self.grid[rowIndex][keys[1]] == 3:
                             if turn % 2 == 1:
-                                self.grid[rowIndex][keys[1]] = 1
                                 turnTxt = "Player 2's turn"
+                                if self.grid[rowIndex][keys[1]] != 3:
+                                    self.grid[rowIndex][keys[1]] = 1
+                                else:
+                                    self.grid[rowIndex][keys[1]] = 4
                             else:
-                                self.grid[rowIndex][keys[1]] = 2
                                 turnTxt = "Player 1's turn"
+                                if self.grid[rowIndex][keys[1]] != 3:
+                                    self.grid[rowIndex][keys[1]] = 2
+                                else:
+                                    self.grid[rowIndex][keys[1]] = 4
                             turn += 1
                             break
         if self.win(self.grid)[1]:
             turnTxt = 'Player ' + str(self.win(self.grid)[0]) + ' won the game! Press Esc to play again.'
 
         if key == arcade.key.ESCAPE:
-            menu_view = MenuView()
+            turnTxt = "Player 1's turn"
+            menu_view = startscreen.MenuView()
             self.window.show_view(menu_view)
             menu_view.setup()
                     
@@ -390,15 +265,30 @@ class Connect4(arcade.View):
                 x = (margins + width) * column + margins + width // 2
                 y = (margins + height) * row + margins + height // 2
 
+                bombed = False
+
                 if self.grid[row][column] == 1:
-                    tokencolor = player1color
+                    tokencolor = self.player1color
                 elif self.grid[row][column] == 2:
-                    tokencolor = player2color
+                    tokencolor = self.player2color
+                elif self.grid[row][column] == 4:
+                    bombed = True
+                    bomb = arcade.Sprite(":resources:images/tiles/bomb.png",0.6)
+                    bomb.center_x = x+80
+                    bomb.center_y = y
+                    self.bomb_list.append(bomb)
+                    
+                    
 
                 # Draw the box
                 arcade.draw_rectangle_filled(x+80, y, width, height, color)
                 arcade.draw_text(str(column),x+80,550,arcade.color.BLACK, font_size=20, anchor_x="center")
-                arcade.draw_circle_filled(x+80,y,30,tokencolor)
+                if bombed == True:
+                    #arcade.draw_text('BOMB', x+80, y, arcade.color.BLACK, font_size=25, anchor_x='center')
+                    self.bomb_list.draw()
+                    bombed = False
+                else:
+                    arcade.draw_circle_filled(x+80,y,30,tokencolor)
         
         arcade.draw_rectangle_filled(WIDTH/2, 750, 700, 85, arcade.color.WHITE)
         arcade.draw_text("On your keyboard, press on the number corresponding to\nthe column you want to place your token in.\nPress Esc to reset.", WIDTH/2,715,
@@ -408,26 +298,5 @@ class Connect4(arcade.View):
         arcade.draw_text(turnTxt, WIDTH/2,625,
                          arcade.color.BLACK, font_size=30, anchor_x="center")
         
-
-    
-
-
-class GameOverView(arcade.View):
-    """ Class to manage the game over view """
-    def on_show(self):
-        """ Called when switching to this view"""
-        arcade.set_background_color(arcade.color.BLACK)
-
-    def on_draw(self):
-        """ Draw the game over view """
-        arcade.start_render()
-        arcade.draw_text("Game Over - press ESCAPE to advance", WIDTH/2, HEIGHT/2,
-                         arcade.color.WHITE, 30, anchor_x="center")
-
-    def on_key_press(self, key, _modifiers):
-        """ If user hits escape, go back to the main menu view """
-        if key == arcade.key.ESCAPE:
-            menu_view = MenuView()
-            self.window.show_view(menu_view)
-
-
+        arcade.draw_text("BOMBED MODE", 100,675,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
